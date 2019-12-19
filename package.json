@@ -10,6 +10,11 @@
     "build:types": "tsc --emitDeclarationOnly",
     "build:js": "babel src --out-dir lib --extensions \".ts,.tsx\" --source-maps inline"
   },
+  "homepage": "https://github.com/kkirby/react-native-infinite-scroller",
+  "repository": {
+	  "type": "git",
+	  "url": "https://github.com/kkirby/react-native-infinite-scroller.git"
+  },
   "keywords": ["react-native","scroller","carousel","infinite"],
   "author": "Kyle Kirbatski",
   "license": "Unlicense",

@@ -6,6 +6,12 @@ This library was created because I was unable to find a good infinite scrolling
 component for react-native. The code in this library is heavily inspired by [cubiq](https://github.com/cubiq)'s [iScroll](https://github.com/cubiq/iscroll). A lot of the infinite logic has been ported from iScroll. See [src/InfiniteCalculator.ts](./src/InfiniteCalculator.ts).
 
 
+## Installation
+
+```
+npm install @kkirbatski/react-native-infinite-scroller --save
+```
+
 ## Usage
 
 Take a look at the [example](./src/example/index.tsx).
@@ -22,17 +28,17 @@ width/heights and item offsets.
 
 ```javascript
 interface InfiniteScrollerProps<T> {
-	dataset(start: number, count: number): Promise<T[]>;
-	renderItem: (data: T | null) => React.ReactElement;
-	style?: StyleProp<ViewStyle>;
-	totalItemCount?: number | null;
-	centerInWrapper?: boolean | null;
-	startingPosition?: number | null;
-	onScrollEnd?: (
-		scrollPosition: number,
-		scroller: InfiniteScroller<T>,
-	) => void | null;
-	infiniteElementCount?: number | null;
+  dataset(start: number, count: number): Promise<T[]>;
+  renderItem: (data: T | null) => React.ReactElement;
+  style?: StyleProp<ViewStyle>;
+  totalItemCount?: number | null;
+  centerInWrapper?: boolean | null;
+  startingPosition?: number | null;
+  onScrollEnd?: (
+  	scrollPosition: number,
+  	scroller: InfiniteScroller<T>,
+  ) => void | null;
+  infiniteElementCount?: number | null;
 }
 ```
 
