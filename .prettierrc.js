@@ -1,0 +1,15 @@
+module.exports = {
+	bracketSpacing: false,
+	jsxBracketSameLine: true,
+	singleQuote: true,
+	trailingComma: 'all',
+	useTabs: true,
+	overrides: [
+		{
+			files: 'package.json',
+			options: {
+				useTabs: false,
+			},
+		},
+	],
+};

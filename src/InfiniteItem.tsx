@@ -1,0 +1,63 @@
+import React, {useState, useEffect, useMemo} from 'react';
+import InfiniteElement from './InfiniteElement';
+import {LayoutChangeEvent, View} from 'react-native';
+
+interface ItemProps<T> {
+	item: InfiniteElement<T>;
+	renderItem: (data: T | null) => React.ReactElement;
+	onLayout: (e: LayoutChangeEvent) => void;
+}
+
+interface ItemState<T> {
+	left: number;
+	data: T | null;
+}
+
+interface StyleMemo {
+	position: 'absolute';
+	left: number;
+}
+
+export default function InfiniteItem<T>({
+	item,
+	renderItem,
+	onLayout,
+}: ItemProps<T>) {
+	const [state, setState] = useState<ItemState<T>>({
+		left: item.left,
+		data: item.data,
+	});
+
+	useEffect(() => {
+		const onUpdate = () => {
+			setState({
+				data: item.data,
+				left: item.left,
+			});
+		};
+
+		item.on('update', onUpdate);
+
+		return () => {
+			item.off('update', onUpdate);
+		};
+	}, [item]);
+
+	const style = useMemo<StyleMemo>(() => {
+		return {
+			position: 'absolute',
+			left: state.left,
+		};
+	}, [state.left]);
+
+	/*const renderedItem = useMemo(() => renderItem(state.data), [
+		state.data,
+		renderItem,
+	]);*/
+
+	return (
+		<View style={style} onLayout={onLayout}>
+			{renderItem(state.data)}
+		</View>
+	);
+}
