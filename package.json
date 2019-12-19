@@ -2,7 +2,7 @@
   "name": "@kkirbatski/react-native-infinite-scroller",
   "version": "1.0.0",
   "description": "An infinite scroller for react-native.",
-  "main": "lib/index.js",
+  "main": "lib/InfiniteScroller.js",
   "scripts": {
     "type-check": "tsc --noEmit",
     "type-check:watch": "npm run type-check -- --watch",
