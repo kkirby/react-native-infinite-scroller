@@ -1,6 +1,6 @@
 {
   "name": "@kkirbatski/react-native-infinite-scroller",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "An infinite scroller for react-native.",
   "main": "lib/InfiniteScroller.js",
   "scripts": {
@@ -12,10 +12,15 @@
   },
   "homepage": "https://github.com/kkirby/react-native-infinite-scroller",
   "repository": {
-	  "type": "git",
-	  "url": "https://github.com/kkirby/react-native-infinite-scroller.git"
+    "type": "git",
+    "url": "https://github.com/kkirby/react-native-infinite-scroller.git"
   },
-  "keywords": ["react-native","scroller","carousel","infinite"],
+  "keywords": [
+    "react-native",
+    "scroller",
+    "carousel",
+    "infinite"
+  ],
   "author": "Kyle Kirbatski",
   "license": "Unlicense",
   "dependencies": {
