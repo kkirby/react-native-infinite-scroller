@@ -24,13 +24,13 @@
   "author": "Kyle Kirbatski",
   "license": "Unlicense",
   "dependencies": {
-    "@kkirbatski/js-to-reanimated.macro": "^0.0.8",
     "events": "^3.0.0",
     "mobx": "^5.15.1",
     "react-native-gesture-handler": "^1.5.2",
     "react-native-reanimated": "^1.4.0"
   },
   "devDependencies": {
+	"@kkirbatski/js-to-reanimated.macro": "^0.0.8",
     "@babel/cli": "^7.7.7",
     "@babel/core": "^7.7.7",
     "@babel/plugin-proposal-class-properties": "^7.7.4",
