@@ -128,7 +128,9 @@ export default class InfiniteScroller<T> extends Component<
 		const itemWidth = this.state.itemLayout.width;
 		const wrapperWidth = this.state.wrapperLayout.width;
 		const centerInWrapper =
-			this.props.centerInWrapper != null ? this.props.centerInWrapper : false;
+			this.props.centerInWrapper != null
+				? this.props.centerInWrapper
+				: false;
 		const center = centerInWrapper ? wrapperWidth / 2 - itemWidth / 2 : 0;
 		/**
 		 * The value will be slighly off because our snap end threshhold is a

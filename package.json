@@ -8,7 +8,7 @@
     "type-check:watch": "npm run type-check -- --watch",
     "build": "node ./buildScript.js",
     "build:types": "tsc --emitDeclarationOnly",
-    "build:js": "babel src --out-dir lib --extensions \".ts,.tsx\" --source-maps inline"
+    "build:js": "babel src --out-dir lib --extensions \".ts,.tsx,.js\" --source-maps inline"
   },
   "homepage": "https://github.com/kkirby/react-native-infinite-scroller",
   "repository": {
@@ -30,7 +30,7 @@
     "react-native-reanimated": "^1.4.0"
   },
   "devDependencies": {
-	"@kkirbatski/js-to-reanimated.macro": "^0.0.8",
+    "@kkirbatski/js-to-reanimated.macro": "^0.0.8",
     "@babel/cli": "^7.7.7",
     "@babel/core": "^7.7.7",
     "@babel/plugin-proposal-class-properties": "^7.7.4",
