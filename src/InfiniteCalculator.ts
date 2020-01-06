@@ -98,7 +98,8 @@ export default class InfiniteCalculator<T> extends EventEmitter {
 
 	@computed get dataStart() {
 		return (
-			this.cachePhase * this.infiniteCacheBuffer - this.infiniteCacheBuffer
+			this.cachePhase * this.infiniteCacheBuffer -
+			this.infiniteCacheBuffer
 		);
 	}
 
@@ -150,7 +151,8 @@ export default class InfiniteCalculator<T> extends EventEmitter {
 		let updates = [];
 		while (i < this.infiniteLength) {
 			let left =
-				i * this.infiniteElementWidth + this.majorPhase * this.infiniteWidth;
+				i * this.infiniteElementWidth +
+				this.majorPhase * this.infiniteWidth;
 
 			if (this.phase > i) {
 				left += this.infiniteElementWidth * this.infiniteLength;

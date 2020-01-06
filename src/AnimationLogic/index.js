@@ -282,7 +282,10 @@ export default function AnimationLogic() {
 					// Set velocity to 0 since we're not scrolling
 					velocity = 0;
 					// This checks if the scrollToValue changed, or if the state changed from spring to scroll.
-					if (previousLogicState !== logicState || diff(scrollToValue) !== 0) {
+					if (
+						previousLogicState !== logicState ||
+						diff(scrollToValue) !== 0
+					) {
 						// Stop everything, resetting it
 						decayState.stop;
 						springState.stop;
