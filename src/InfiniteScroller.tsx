@@ -72,9 +72,9 @@ export default class InfiniteScroller<T> extends Component<
 		this.animationLogic.on('change', value => {
 			this.infiniteCalculator.x = value;
 		});
-		this.animationLogic.on('scrollEnd', _value => {
+		this.animationLogic.on('scrollEnd', value => {
 			if (this.props.onScrollEnd) {
-				this.props.onScrollEnd(this.getCurrentIndex(), this);
+				this.props.onScrollEnd(this.calculateCurrentIndex(value), this);
 			}
 		});
 
@@ -123,8 +123,7 @@ export default class InfiniteScroller<T> extends Component<
 		}
 	}
 
-	getCurrentIndex() {
-		const moveXValue = this.infiniteCalculator.x;
+	calculateCurrentIndex(moveXValue: number) {
 		const itemWidth = this.state.itemLayout.width;
 		const wrapperWidth = this.state.wrapperLayout.width;
 		const centerInWrapper =
@@ -137,6 +136,10 @@ export default class InfiniteScroller<T> extends Component<
 		 * bit high to ensure events are triggered in a timley manner.
 		 **/
 		return Math.round((center - moveXValue) / itemWidth);
+	}
+
+	getCurrentIndex() {
+		return this.calculateCurrentIndex(this.infiniteCalculator.x);
 	}
 
 	async goNext(withAnimation: boolean = true) {

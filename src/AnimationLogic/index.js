@@ -83,6 +83,14 @@ export default function AnimationLogic() {
 	const springState = (() => {
 		let snapPoint = new Animated.Value(0);
 
+		let snapPointWithCenter = re(() => {
+			if (centerScroll === 1) {
+				snapPoint + center - itemWidth;
+			} else {
+				snapPoint;
+			}
+		});
+
 		const helper = springHelper(x, snapPoint, velocity);
 
 		return {
@@ -106,6 +114,7 @@ export default function AnimationLogic() {
 							snapPoint = maxScrollX;
 						}
 					}
+					call([snapPointWithCenter], onScrollEnd);
 				}
 				helper.tick;
 			}),
