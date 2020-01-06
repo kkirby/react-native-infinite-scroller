@@ -30,6 +30,7 @@ export default class InfiniteScroller<T> extends Component<InfiniteScrollerProps
     animationLogic: AnimationLogic;
     constructor(props: InfiniteScrollerProps<T>);
     componentDidUpdate(_prevProps: InfiniteScrollerProps<T>, prevState: InfiniteScrollerState): void;
+    calculateCurrentIndex(moveXValue: number): number;
     getCurrentIndex(): number;
     goNext(withAnimation?: boolean): Promise<void>;
     goBack(withAnimation?: boolean): Promise<void>;
