@@ -1,6 +1,6 @@
 import {EventEmitter} from 'events';
 import InfiniteElement from './InfiniteElement';
-import {observable, computed, reaction} from 'mobx';
+import {observable, computed, reaction, trace, observe} from 'mobx';
 
 interface iScrollOptions<T> {
 	infiniteLimit: number;
@@ -103,44 +103,58 @@ export default class InfiniteCalculator<T> extends EventEmitter {
 		);
 	}
 
+	disposers: (() => void)[] = [];
+
 	constructor(options: iScrollOptions<T>) {
 		super();
 		this.infiniteElements = options.infiniteElements;
 		this.dataset = options.dataset;
 		this.cacheSize = options.cacheSize;
 		this.infiniteLimit = options.infiniteLimit;
-
-		reaction(
-			() => {
-				return {
-					updates: this.reorderInfinite(),
-				};
-			},
-			({updates}) => {
-				if (updates) {
-					this.updateContent(updates);
-				}
-			},
+		this.disposers.push(
+			reaction(
+				() => {
+					return {
+						updates: this.reorderInfinite(),
+					};
+				},
+				({updates}) => {
+					if (updates) {
+						this.updateContent(updates);
+					}
+				},
+				{
+					scheduler(cb) {
+						cb();
+					},
+				},
+			),
 		);
 
-		reaction(
-			() => {
-				return {
-					dataset: this.dataset,
-					dataStart: this.dataStart,
-					cacheSize: this.cacheSize,
-				};
-			},
-			({dataset, dataStart, cacheSize}) => {
-				dataset(dataStart, cacheSize).then(value =>
-					this.updateCache(dataStart, value),
-				);
-			},
+		this.disposers.push(
+			reaction(
+				() => {
+					return {
+						dataset: this.dataset,
+						dataStart: this.dataStart,
+						cacheSize: this.cacheSize,
+					};
+				},
+				({dataset, dataStart, cacheSize}) => {
+					dataset(dataStart, cacheSize).then(value =>
+						this.updateCache(dataStart, value),
+					);
+				},
+			),
 		);
 
 		this.dataset(this.dataStart, this.cacheSize).then(value =>
 			this.updateCache(this.dataStart, value),
 		);
+	}
+
+	dispose() {
+		this.disposers.forEach(f => f());
 	}
 
 	reorderInfinite() {
@@ -154,7 +168,7 @@ export default class InfiniteCalculator<T> extends EventEmitter {
 				i * this.infiniteElementWidth +
 				this.majorPhase * this.infiniteWidth;
 
-			if (this.phase > i) {
+			if (this.phase - this.elementsPerPage > i) {
 				left += this.infiniteElementWidth * this.infiniteLength;
 			}
 

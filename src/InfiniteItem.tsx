@@ -5,7 +5,7 @@ import {LayoutChangeEvent, View} from 'react-native';
 interface ItemProps<T> {
 	item: InfiniteElement<T>;
 	renderItem: (data: T | null) => React.ReactElement;
-	onLayout: (e: LayoutChangeEvent) => void;
+	onLayout?: ((e: LayoutChangeEvent) => void) | null;
 }
 
 interface ItemState<T> {
@@ -50,13 +50,12 @@ export default function InfiniteItem<T>({
 		};
 	}, [state.left]);
 
-	/*const renderedItem = useMemo(() => renderItem(state.data), [
-		state.data,
-		renderItem,
-	]);*/
+	const props = {
+		onLayout: onLayout != null ? onLayout : undefined,
+	};
 
 	return (
-		<View style={style} onLayout={onLayout}>
+		<View style={style} {...props}>
 			{renderItem(state.data)}
 		</View>
 	);

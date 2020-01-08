@@ -17,7 +17,7 @@ const LogicState = {
 
 export default function AnimationLogic() {
 	const eventEmitter = new EventEmitter();
-
+	const randomValue = new Animated.Value(0);
 	/**
 	 * This is used to determine velocity. The clock is started and stopped,
 	 * and the time in between start and stops is used to calculate velocity.
@@ -73,8 +73,18 @@ export default function AnimationLogic() {
 	/**
 	 * Handler for when the scroll ends.
 	 **/
-	const onScrollEnd = value => {
-		eventEmitter.emit('scrollEnd', value[0]);
+	const onScrollEnd = ([scrollEndXWithCenter, scrollEndX]) => {
+		eventEmitter.emit('scrollEnd', {
+			xWithCenter: scrollEndXWithCenter,
+			x: scrollEndX,
+		});
+	};
+
+	/**
+	 * Handler for when the scroll has settled and no more animations are playing.
+	 **/
+	const onScrollSettled = value => {
+		eventEmitter.emit('scrollSettled', value[0]);
 	};
 
 	/**
@@ -114,7 +124,7 @@ export default function AnimationLogic() {
 							snapPoint = maxScrollX;
 						}
 					}
-					call([snapPointWithCenter], onScrollEnd);
+					call([snapPointWithCenter, snapPoint], onScrollEnd);
 				}
 				helper.tick;
 			}),
@@ -287,13 +297,14 @@ export default function AnimationLogic() {
 					springState.stop;
 					x = scrollToValue;
 					logicState = LogicState.IDLE;
+					call([xWithCenter], onScrollEnd);
 				} else {
 					// Set velocity to 0 since we're not scrolling
 					velocity = 0;
 					// This checks if the scrollToValue changed, or if the state changed from spring to scroll.
 					if (
-						previousLogicState !== logicState ||
-						diff(scrollToValue) !== 0
+						diff(scrollToValue) !== 0 ||
+						previousLogicState !== logicState
 					) {
 						// Stop everything, resetting it
 						decayState.stop;
@@ -306,9 +317,9 @@ export default function AnimationLogic() {
 				}
 			}
 		}
-		// Scroll has ended
+		// Scroll has settled
 		if (diff(logicState) !== 0 && logicState === LogicState.IDLE) {
-			call([xWithCenter, logicState], onScrollEnd);
+			call([xWithCenter, logicState], onScrollSettled);
 		}
 		// X has changed
 		call([xWithCenter], onXChange);

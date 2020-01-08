@@ -28,7 +28,7 @@ export default function App() {
 			if (!scroller.current) {
 				return;
 			}
-			scroller.current.scrollTo(item.index, true);
+			scroller.current.scrollToIndex(item.index, true);
 		};
 		return (
 			<TouchableOpacity onPress={onPress}>

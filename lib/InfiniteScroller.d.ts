@@ -10,7 +10,7 @@ interface InfiniteScrollerProps<T> {
     totalItemCount?: number | null;
     centerInWrapper?: boolean | null;
     startingPosition?: number | null;
-    onScrollEnd?: (scrollPosition: number, scroller: InfiniteScroller<T>) => void | null;
+    onScrollEnd?: (scrollPosition: number, data: T | null, scroller: InfiniteScroller<T>) => void | null;
     infiniteElementCount?: number | null;
 }
 interface InfiniteScrollerState {
@@ -28,13 +28,18 @@ export default class InfiniteScroller<T> extends Component<InfiniteScrollerProps
     infiniteCalculator: InfiniteCalculator<T>;
     infiniteElements: InfiniteElement<T>[];
     animationLogic: AnimationLogic;
+    currentElement?: InfiniteElement<T> | null;
     constructor(props: InfiniteScrollerProps<T>);
     componentDidUpdate(_prevProps: InfiniteScrollerProps<T>, prevState: InfiniteScrollerState): void;
+    componentWillUnmount(): void;
     calculateCurrentIndex(moveXValue: number): number;
     getCurrentIndex(): number;
     goNext(withAnimation?: boolean): Promise<void>;
     goBack(withAnimation?: boolean): Promise<void>;
-    scrollTo(itemOffset: number, withAnimation?: boolean): Promise<void>;
+    scrollToIndex(itemOffset: number, withAnimation?: boolean): void;
+    scrollToElement(element: InfiniteElement<T>, withAnimation?: boolean): void;
+    findNearestInfiniteElement(comparator: (item: InfiniteElement<T>) => boolean): InfiniteElement<T> | undefined;
+    scrollToItem(comparator: (item: T | null) => boolean, withAnimation?: boolean): void;
     onItemLayout: ({ nativeEvent: { layout: { width, height }, }, }: LayoutChangeEvent) => void;
     onWrapperLayout: ({ nativeEvent: { layout: { width, height }, }, }: LayoutChangeEvent) => void;
     render(): JSX.Element;

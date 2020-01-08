@@ -17,6 +17,7 @@ interface InfiniteScrollerProps<T> {
 	startingPosition?: number | null;
 	onScrollEnd?: (
 		scrollPosition: number,
+		data: T | null,
 		scroller: InfiniteScroller<T>,
 	) => void | null;
 	infiniteElementCount?: number | null;
@@ -41,6 +42,7 @@ export default class InfiniteScroller<T> extends Component<
 	infiniteCalculator: InfiniteCalculator<T>;
 	infiniteElements: InfiniteElement<T>[] = [];
 	animationLogic: AnimationLogic;
+	currentElement?: InfiniteElement<T> | null;
 
 	constructor(props: InfiniteScrollerProps<T>) {
 		super(props);
@@ -72,9 +74,23 @@ export default class InfiniteScroller<T> extends Component<
 		this.animationLogic.on('change', value => {
 			this.infiniteCalculator.x = value;
 		});
-		this.animationLogic.on('scrollEnd', value => {
+		this.animationLogic.on('scrollEnd', ({x}) => {
 			if (this.props.onScrollEnd) {
-				this.props.onScrollEnd(this.calculateCurrentIndex(value), this);
+				x *= -1;
+				this.currentElement = this.infiniteElements.find(
+					element => element.left === x,
+				);
+				if (this.currentElement != null) {
+					this.props.onScrollEnd(
+						this.currentElement.phase,
+						this.currentElement.data,
+						this,
+					);
+				} else {
+					console.warn(
+						'InfiniteScroller is unable to determine the current item after the scroll ended.',
+					);
+				}
 			}
 		});
 
@@ -108,7 +124,7 @@ export default class InfiniteScroller<T> extends Component<
 			this.state.ready === false
 		) {
 			if (this.props.startingPosition != null) {
-				this.scrollTo(this.props.startingPosition, false);
+				this.scrollToIndex(this.props.startingPosition, false);
 			}
 			// eslint-disable-next-line react/no-did-update-set-state
 			this.setState({
@@ -121,6 +137,10 @@ export default class InfiniteScroller<T> extends Component<
 				-1 * this.state.itemLayout.width * this.props.totalItemCount,
 			);
 		}
+	}
+
+	componentWillUnmount() {
+		this.infiniteCalculator.dispose();
 	}
 
 	calculateCurrentIndex(moveXValue: number) {
@@ -144,19 +164,48 @@ export default class InfiniteScroller<T> extends Component<
 
 	async goNext(withAnimation: boolean = true) {
 		const index = this.getCurrentIndex();
-		return this.scrollTo(index + 1, withAnimation);
+		return this.scrollToIndex(index + 1, withAnimation);
 	}
 
 	async goBack(withAnimation: boolean = true) {
 		const index = this.getCurrentIndex();
-		return this.scrollTo(index - 1, withAnimation);
+		return this.scrollToIndex(index - 1, withAnimation);
 	}
 
-	async scrollTo(itemOffset: number, withAnimation: boolean = true) {
+	scrollToIndex(itemOffset: number, withAnimation: boolean = true) {
 		this.animationLogic.scrollTo(
 			-1 * itemOffset * this.state.itemLayout.width,
 			withAnimation,
 		);
+	}
+
+	scrollToElement(element: InfiniteElement<T>, withAnimation?: boolean) {
+		return this.scrollToIndex(element.phase, withAnimation);
+	}
+
+	findNearestInfiniteElement(
+		comparator: (item: InfiniteElement<T>) => boolean,
+	): InfiniteElement<T> | undefined {
+		const x = -1 * this.infiniteCalculator.x;
+		let elements = this.infiniteElements.sort((a, b) => {
+			const aDelta = Math.abs(x - a.left);
+			const bDelta = Math.abs(x - b.left);
+			return aDelta - bDelta;
+		});
+		return elements.find(item => comparator(item));
+	}
+
+	scrollToItem(
+		comparator: (item: T | null) => boolean,
+		withAnimation?: boolean,
+	) {
+		const element = this.findNearestInfiniteElement(elm =>
+			elm.data != null ? comparator(elm.data) : false,
+		);
+
+		if (element) {
+			return this.scrollToElement(element, withAnimation);
+		}
 	}
 
 	onItemLayout = ({
@@ -214,7 +263,9 @@ export default class InfiniteScroller<T> extends Component<
 									renderItem={this.props.renderItem}
 									item={item}
 									key={i}
-									onLayout={this.onItemLayout}
+									onLayout={
+										i === 0 ? this.onItemLayout : null
+									}
 								/>
 							);
 						})}
