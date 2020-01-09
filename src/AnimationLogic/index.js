@@ -297,7 +297,7 @@ export default function AnimationLogic() {
 					springState.stop;
 					x = scrollToValue;
 					logicState = LogicState.IDLE;
-					call([xWithCenter], onScrollEnd);
+					call([xWithCenter, x], onScrollEnd);
 				} else {
 					// Set velocity to 0 since we're not scrolling
 					velocity = 0;
