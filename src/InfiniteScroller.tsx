@@ -21,6 +21,7 @@ interface InfiniteScrollerProps<T> {
 		scroller: InfiniteScroller<T>,
 	) => void | null;
 	infiniteElementCount?: number | null;
+	waitFor?: any[]
 }
 
 interface InfiniteScrollerState {
@@ -245,6 +246,7 @@ export default class InfiniteScroller<T> extends Component<
 		};
 		return (
 			<PanGestureHandler
+				waitFor={this.props.waitFor}
 				onGestureEvent={this.animationLogic.gestureHandler}
 				onHandlerStateChange={this.animationLogic.gestureHandler}>
 				<Animated.View
