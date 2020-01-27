@@ -12,6 +12,7 @@ interface InfiniteScrollerProps<T> {
     startingPosition?: number | null;
     onScrollEnd?: (scrollPosition: number, data: T | null, scroller: InfiniteScroller<T>) => void | null;
     infiniteElementCount?: number | null;
+    waitFor?: any[];
 }
 interface InfiniteScrollerState {
     itemLayout: {
