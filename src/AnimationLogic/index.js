@@ -194,6 +194,7 @@ export default function AnimationLogic() {
 		let data = {
 			x: new Animated.Value(0),
 			state: new Animated.Value(-1),
+			velocityX: new Animated.Value(0)
 		};
 
 		/**
@@ -230,8 +231,8 @@ export default function AnimationLogic() {
 		let end = re(() => {
 			stopClock(baseClock);
 			endTime = baseClock;
-			velocity = (distX / (endTime - startTime)) * 1000;
-			if (shouldSpringInsteadOfDecay === 0) {
+			velocity = data.velocityX; //(distX / (endTime - startTime)) * 1000;
+			if (shouldSpringInsteadOfDecay === 0 && abs(velocity) > 3000) {
 				logicState = LogicState.DECAY;
 				decayState.tick;
 			} else {
