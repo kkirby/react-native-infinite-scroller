@@ -260,6 +260,7 @@ export default class InfiniteScroller<T> extends Component<
 						{this.infiniteElements.map((item, i) => {
 							return (
 								<InfiniteItem<T>
+									elementIndex={i}
 									renderItem={this.props.renderItem}
 									item={item}
 									key={i}

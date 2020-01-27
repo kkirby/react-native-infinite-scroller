@@ -4,8 +4,9 @@ import {LayoutChangeEvent, View} from 'react-native';
 
 interface ItemProps<T> {
 	item: InfiniteElement<T>;
-	renderItem: (data: T | null) => React.ReactElement;
+	renderItem: (data: T | null, elementIndex: number) => React.ReactElement;
 	onLayout?: ((e: LayoutChangeEvent) => void) | null;
+	elementIndex: number;
 }
 
 interface ItemState<T> {
@@ -22,6 +23,7 @@ export default function InfiniteItem<T>({
 	item,
 	renderItem,
 	onLayout,
+	elementIndex
 }: ItemProps<T>) {
 	const [state, setState] = useState<ItemState<T>>({
 		left: item.left,
@@ -56,7 +58,7 @@ export default function InfiniteItem<T>({
 
 	return (
 		<View style={style} {...props}>
-			{renderItem(state.data)}
+			{renderItem(state.data,elementIndex)}
 		</View>
 	);
 }
