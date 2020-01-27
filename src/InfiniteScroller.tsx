@@ -45,6 +45,7 @@ export default class InfiniteScroller<T> extends Component<
 	infiniteElements: InfiniteElement<T>[] = [];
 	animationLogic: AnimationLogic;
 	currentElement?: InfiniteElement<T> | null;
+	panHandlerRef: React.RefObject<PanGestureHandler>;
 
 	constructor(props: InfiniteScrollerProps<T>) {
 		super(props);
@@ -99,6 +100,8 @@ export default class InfiniteScroller<T> extends Component<
 		if (props.centerInWrapper != null) {
 			this.animationLogic.updateCenterScroll(props.centerInWrapper);
 		}
+		
+		this.panHandlerRef = React.createRef();
 	}
 
 	componentDidUpdate(
@@ -247,6 +250,7 @@ export default class InfiniteScroller<T> extends Component<
 		};
 		return (
 			<PanGestureHandler
+				ref={this.panHandlerRef}
 				simultaneousHandlers={this.props.simultaneousHandlers}
 				waitFor={this.props.waitFor}
 				onGestureEvent={this.animationLogic.gestureHandler}
