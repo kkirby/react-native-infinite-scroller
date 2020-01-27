@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { LayoutChangeEvent, StyleProp, ViewStyle } from 'react-native';
+import { PanGestureHandler } from 'react-native-gesture-handler';
 import InfiniteElement from './InfiniteElement';
 import InfiniteCalculator from './InfiniteCalculator';
 import AnimationLogic from './AnimationLogic';
@@ -12,7 +13,8 @@ interface InfiniteScrollerProps<T> {
     startingPosition?: number | null;
     onScrollEnd?: (scrollPosition: number, data: T | null, scroller: InfiniteScroller<T>) => void | null;
     infiniteElementCount?: number | null;
-    waitFor?: any[];
+    waitFor?: React.RefObject<any>[];
+    simultaneousHandlers?: React.RefObject<any>[];
 }
 interface InfiniteScrollerState {
     itemLayout: {
@@ -30,6 +32,7 @@ export default class InfiniteScroller<T> extends Component<InfiniteScrollerProps
     infiniteElements: InfiniteElement<T>[];
     animationLogic: AnimationLogic;
     currentElement?: InfiniteElement<T> | null;
+    panHandlerRef: React.RefObject<PanGestureHandler>;
     constructor(props: InfiniteScrollerProps<T>);
     componentDidUpdate(_prevProps: InfiniteScrollerProps<T>, prevState: InfiniteScrollerState): void;
     componentWillUnmount(): void;
