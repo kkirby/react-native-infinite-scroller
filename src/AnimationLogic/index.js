@@ -5,7 +5,7 @@ import {State} from 'react-native-gesture-handler';
 import EventEmitter from 'events';
 import {decayHelper, springHelper} from './ReanimatedHelpers';
 import Animated from 'react-native-reanimated';
-const {call, stopClock, startClock, diff, debug, round} = Animated;
+const {call, stopClock, startClock, diff, debug, abs, round} = Animated;
 
 const LogicState = {
 	IDLE: 0,
@@ -15,7 +15,8 @@ const LogicState = {
 	SCROLL_TO: 4,
 };
 
-export default function AnimationLogic() {
+export default function AnimationLogic(options = {}) {
+	const {springConfig,decayConfig} = options;
 	const eventEmitter = new EventEmitter();
 	const randomValue = new Animated.Value(0);
 	/**
@@ -62,6 +63,11 @@ export default function AnimationLogic() {
 	 * Holds wether or not the scroll to should be animated.
 	 **/
 	let scrollToWithAnimation = new Animated.Value(0);
+	
+	/**
+	 *
+	 **/
+	let springToNextItemInDirection = new Animated.Value(0);
 
 	/**
 	 * Handler for when the x value changes.
@@ -101,7 +107,7 @@ export default function AnimationLogic() {
 			}
 		});
 
-		const helper = springHelper(x, snapPoint, velocity);
+		const helper = springHelper(x, snapPoint, velocity, springConfig);
 
 		return {
 			...helper,
@@ -111,7 +117,12 @@ export default function AnimationLogic() {
 						round(
 							(() => {
 								if (logicState === LogicState.SPRING) {
-									x;
+									if(springToNextItemInDirection !== 0){
+										x + itemWidth * springToNextItemInDirection;
+									}
+									else {
+										x;
+									}
 								} else {
 									scrollToValue;
 								}
@@ -151,7 +162,7 @@ export default function AnimationLogic() {
 	 * Handles decay related stuff.
 	 **/
 	const decayState = (() => {
-		const helper = decayHelper(x, velocity, 0.997);
+		const helper = decayHelper(x, velocity, decayConfig && decayConfig.deceleration ? decayConfig.deceleration : 0.997);
 		/**
 		 * Defines if the decay ended up going past our min/max x (if set)
 		 **/
@@ -179,7 +190,6 @@ export default function AnimationLogic() {
 			}),
 		};
 	})();
-
 	/**
 	 * Handles everything related to gestures
 	 **/
@@ -217,6 +227,7 @@ export default function AnimationLogic() {
 			pointX = data.x;
 			distX = distX + deltaX;
 			newX = x + deltaX;
+			// This will give an elastic feel when over-scrolling, adding resistance to the pull.
 			if (maxScrollX !== 0) {
 				if (newX > 0 || newX < maxScrollX) {
 					newX = x + deltaX / 3;
@@ -231,13 +242,15 @@ export default function AnimationLogic() {
 		let end = re(() => {
 			stopClock(baseClock);
 			endTime = baseClock;
-			velocity = data.velocityX; //(distX / (endTime - startTime)) * 1000;
-			if (shouldSpringInsteadOfDecay === 0 && abs(velocity) > 3000) {
-				logicState = LogicState.DECAY;
-				decayState.tick;
-			} else {
+			velocity = data.velocityX;
+			if (shouldSpringInsteadOfDecay === 1 || abs(velocity) < 3000) {
+				springToNextItemInDirection = abs(velocity) / velocity;
 				logicState = LogicState.SPRING;
 				springState.tick;
+			} else {
+				springToNextItemInDirection = 0;
+				logicState = LogicState.DECAY;
+				decayState.tick;
 			}
 		});
 

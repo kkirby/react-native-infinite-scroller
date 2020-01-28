@@ -13,7 +13,7 @@ const {
 	SpringUtils,
 } = Animated;
 
-export const springHelper = (value, toValue, velocity) => {
+export const springHelper = (value, toValue, velocity,springConfig = {}) => {
 	const clock = new Animated.Clock();
 	const state = {
 		finished: new Animated.Value(0),
@@ -25,6 +25,7 @@ export const springHelper = (value, toValue, velocity) => {
 
 	const config = {
 		...SpringUtils.makeDefaultConfig(),
+		...springConfig,
 		restDisplacementThreshold: 1,
 		restSpeedThreshold: 1,
 		toValue,

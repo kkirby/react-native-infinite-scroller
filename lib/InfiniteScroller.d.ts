@@ -15,6 +15,8 @@ interface InfiniteScrollerProps<T> {
     infiniteElementCount?: number | null;
     waitFor?: React.RefObject<any>[];
     simultaneousHandlers?: React.RefObject<any>[];
+    springConfig?: Object;
+    decayConfig?: Object;
 }
 interface InfiniteScrollerState {
     itemLayout: {

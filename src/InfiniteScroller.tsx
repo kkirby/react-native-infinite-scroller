@@ -21,8 +21,10 @@ interface InfiniteScrollerProps<T> {
 		scroller: InfiniteScroller<T>,
 	) => void | null;
 	infiniteElementCount?: number | null;
-	waitFor?: React.RefObject<any>[],
-	simultaneousHandlers?: React.RefObject<any>[]
+	waitFor?: React.RefObject<any>[];
+	simultaneousHandlers?: React.RefObject<any>[];
+	springConfig?: Object;
+	decayConfig?: Object;
 }
 
 interface InfiniteScrollerState {
@@ -73,7 +75,10 @@ export default class InfiniteScroller<T> extends Component<
 			cacheSize: this.infiniteElements.length * 2,
 		});
 
-		this.animationLogic = AnimationLogic();
+		this.animationLogic = AnimationLogic({
+			springConfig: props.springConfig || {},
+			decayConfig: props.decayConfig || {}
+		});
 		this.animationLogic.on('change', value => {
 			this.infiniteCalculator.x = value;
 		});
