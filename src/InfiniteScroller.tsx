@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {LayoutChangeEvent, StyleProp, ViewStyle} from 'react-native';
+import {LayoutChangeEvent, StyleProp, ViewStyle, View} from 'react-native';
 
 import Animated from 'react-native-reanimated';
 import {PanGestureHandler} from 'react-native-gesture-handler';
@@ -25,6 +25,14 @@ interface InfiniteScrollerProps<T> {
 	simultaneousHandlers?: React.RefObject<any>[];
 	springConfig?: Object;
 	decayConfig?: Object;
+	itemDimensions?: {
+		width: number;
+		height: number;
+	} | null;
+	wrapperDimensions?: {
+		width: number;
+		height: number;
+	} | null;
 }
 
 interface InfiniteScrollerState {
@@ -52,11 +60,11 @@ export default class InfiniteScroller<T> extends Component<
 	constructor(props: InfiniteScrollerProps<T>) {
 		super(props);
 		this.state = {
-			itemLayout: {
+			itemLayout: props.itemDimensions || {
 				width: 0,
 				height: 0,
 			},
-			wrapperLayout: {
+			wrapperLayout: props.wrapperDimensions || {
 				width: 0,
 				height: 0,
 			},
@@ -75,77 +83,132 @@ export default class InfiniteScroller<T> extends Component<
 			cacheSize: this.infiniteElements.length * 2,
 		});
 
+		const startingPosition =
+			props.startingPosition != null
+				? -1 * props.startingPosition * this.state.itemLayout.width
+				: 0;
+
 		this.animationLogic = AnimationLogic({
 			springConfig: props.springConfig || {},
-			decayConfig: props.decayConfig || {}
+			decayConfig: props.decayConfig || {},
+			centerScroll:
+				props.centerInWrapper != null ? props.centerInWrapper : false,
+			wrapperWidth: this.state.wrapperLayout.width,
+			itemWidth: this.state.itemLayout.width,
+			maxScroll:
+				this.state.itemLayout.width !== 0 &&
+				props.totalItemCount != null
+					? -1 * this.state.itemLayout.width * props.totalItemCount
+					: 0,
+			startingPosition,
 		});
+
 		this.animationLogic.on('change', value => {
 			this.infiniteCalculator.x = value;
 		});
-		this.animationLogic.on('scrollEnd', ({x}) => {
-			if (this.props.onScrollEnd) {
-				x *= -1;
-				this.currentElement = this.infiniteElements.find(
-					element => element.left === x,
-				);
-				if (this.currentElement != null) {
-					this.props.onScrollEnd(
-						this.currentElement.phase,
-						this.currentElement.data,
-						this,
-					);
-				} else {
-					console.warn(
-						'InfiniteScroller is unable to determine the current item after the scroll ended.',
-					);
-				}
-			}
-		});
+		this.animationLogic.on('scrollEnd', this.onScrollEnd);
 
-		if (props.centerInWrapper != null) {
-			this.animationLogic.updateCenterScroll(props.centerInWrapper);
-		}
-		
 		this.panHandlerRef = React.createRef();
+
+		this.onUpdate(false);
+
+		if (startingPosition !== 0) {
+			this.onScrollEnd({x: startingPosition});
+		}
 	}
 
-	componentDidUpdate(
-		_prevProps: InfiniteScrollerProps<T>,
-		prevState: InfiniteScrollerState,
-	) {
-		if (
-			prevState.wrapperLayout.width !== this.state.wrapperLayout.width ||
-			prevState.itemLayout.width !== this.state.itemLayout.width
-		) {
-			this.infiniteCalculator.infiniteElementWidth = this.state.itemLayout.width;
-			this.infiniteCalculator.wrapperWidth = this.state.wrapperLayout.width;
-		}
-
-		if (_prevProps.centerInWrapper !== this.props.centerInWrapper) {
-			const centerInWrapper = this.props.centerInWrapper;
-			this.animationLogic.updateCenterScroll(
-				centerInWrapper != null ? centerInWrapper : false,
-			);
-		}
-
-		if (
-			this.state.wrapperLayout.width !== 0 &&
-			this.state.itemLayout.width !== 0 &&
-			this.state.ready === false
-		) {
-			if (this.props.startingPosition != null) {
-				this.scrollToIndex(this.props.startingPosition, false);
-			}
-			// eslint-disable-next-line react/no-did-update-set-state
-			this.setState({
-				ready: true,
+	onScrollEnd = ({x}: {x: number}) => {
+		this.infiniteCalculator.x = x;
+		if (this.props.onScrollEnd) {
+			x *= -1;
+			console.log('scrollEnd: ' + x);
+			this.currentElement = this.infiniteElements.find(element => {
+				console.log(element.left, x);
+				return element.left === x;
 			});
+			console.log('scrollEnd: ', this.currentElement);
+			if (this.currentElement != null) {
+				this.props.onScrollEnd(
+					this.currentElement.phase,
+					this.currentElement.data,
+					this,
+				);
+			} else {
+				console.warn(
+					'InfiniteScroller is unable to determine the current item after the scroll ended.',
+				);
+			}
+		}
+	};
+
+	onUpdate(isMounted: boolean = true) {
+		this.animationLogic.updateCenterScroll(
+			this.props.centerInWrapper != null
+				? this.props.centerInWrapper
+				: false,
+		);
+		if (this.state.itemLayout.width !== 0) {
+			this.infiniteCalculator.infiniteElementWidth = this.state.itemLayout.width;
+			this.animationLogic.updateItemWidth(this.state.itemLayout.width);
+		}
+
+		if (this.state.wrapperLayout.width !== 0) {
+			this.infiniteCalculator.wrapperWidth = this.state.wrapperLayout.width;
+			this.animationLogic.updateWrapperWidth(
+				this.state.wrapperLayout.width,
+			);
 		}
 
 		if (this.state.itemLayout.width && this.props.totalItemCount != null) {
 			this.animationLogic.updateMaxScroll(
 				-1 * this.state.itemLayout.width * this.props.totalItemCount,
 			);
+		}
+
+		this.infiniteCalculator.reorderInfinite();
+
+		this.onReady(isMounted);
+	}
+
+	onReady(isMounted: boolean = true) {
+		if (this.state.ready === false) {
+			if (
+				this.state.itemLayout.width !== 0 &&
+				this.state.wrapperLayout.width !== 0
+			) {
+				if (isMounted) {
+					this.setState({
+						ready: true,
+					});
+				} else {
+					this.state = {
+						...this.state,
+						ready: true,
+					};
+				}
+			}
+		}
+	}
+
+	componentDidUpdate(
+		prevProps: InfiniteScrollerProps<T>,
+		prevState: InfiniteScrollerState,
+	) {
+		let didChange = false;
+		didChange =
+			didChange ||
+			prevState.itemLayout.width !== this.state.itemLayout.width;
+		didChange =
+			didChange ||
+			prevState.wrapperLayout.width !== this.state.wrapperLayout.width;
+		didChange = didChange || prevState.ready !== this.state.ready;
+		didChange =
+			didChange ||
+			prevProps.centerInWrapper !== this.props.centerInWrapper;
+		didChange =
+			didChange || prevProps.totalItemCount !== this.props.totalItemCount;
+		if (didChange) {
+			this.onUpdate();
 		}
 	}
 
@@ -197,7 +260,7 @@ export default class InfiniteScroller<T> extends Component<
 		comparator: (item: InfiniteElement<T>) => boolean,
 	): InfiniteElement<T> | undefined {
 		const x = -1 * this.infiniteCalculator.x;
-		let elements = this.infiniteElements.sort((a, b) => {
+		let elements = [...this.infiniteElements].sort((a, b) => {
 			const aDelta = Math.abs(x - a.left);
 			const bDelta = Math.abs(x - b.left);
 			return aDelta - bDelta;
@@ -229,8 +292,6 @@ export default class InfiniteScroller<T> extends Component<
 				itemLayout: {width, height},
 			});
 		}
-		this.animationLogic.updateItemWidth(width);
-		this.infiniteCalculator.infiniteElementWidth = width;
 	};
 
 	onWrapperLayout = ({
@@ -244,14 +305,12 @@ export default class InfiniteScroller<T> extends Component<
 				wrapperLayout: {width, height},
 			});
 		}
-		this.infiniteCalculator.wrapperWidth = width;
-		this.animationLogic.updateWrapperWidth(width);
 	};
 
 	render() {
 		const style = {
-			opacity: this.state.ready ? 1 : 0,
 			height: this.state.itemLayout.height,
+			opacity: this.state.ready ? 1 : 0,
 		};
 		return (
 			<PanGestureHandler

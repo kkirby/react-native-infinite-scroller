@@ -15,10 +15,17 @@ const LogicState = {
 	SCROLL_TO: 4,
 };
 
+function getOr(value, defaultValue) {
+	if (value != null) {
+		return value;
+	} else {
+		return defaultValue;
+	}
+}
+
 export default function AnimationLogic(options = {}) {
-	const {springConfig,decayConfig} = options;
+	const {springConfig, decayConfig} = options;
 	const eventEmitter = new EventEmitter();
-	const randomValue = new Animated.Value(0);
 	/**
 	 * This is used to determine velocity. The clock is started and stopped,
 	 * and the time in between start and stops is used to calculate velocity.
@@ -30,17 +37,19 @@ export default function AnimationLogic(options = {}) {
 	let logicState = new Animated.Value(LogicState.IDLE);
 	let previousLogicState = new Animated.Value(LogicState.IDLE);
 
-	let x = new Animated.Value(0);
+	let x = new Animated.Value(getOr(options.startingPosition, 0));
 	let velocity = new Animated.Value(0);
 
-	let itemWidth = new Animated.Value(0);
-	let wrapperWidth = new Animated.Value(0);
+	let itemWidth = new Animated.Value(getOr(options.itemWidth, 0));
+	let wrapperWidth = new Animated.Value(getOr(options.wrapperWidth, 0));
 
 	/**
 	 * Holds the center offset
 	 **/
 	let center = re((wrapperWidth + itemWidth) / 2);
-	let centerScroll = new Animated.Value(0);
+	let centerScroll = new Animated.Value(
+		getOr(options.centerScroll, false) ? 1 : 0,
+	);
 	/**
 	 * Holds the value of X + the center offset (if centerScroll is 1).
 	 **/
@@ -52,7 +61,7 @@ export default function AnimationLogic(options = {}) {
 		}
 	});
 
-	let maxScrollX = new Animated.Value(0);
+	let maxScrollX = new Animated.Value(getOr(options.maxScroll, 0));
 
 	/**
 	 * Holds the destination scroll value when `scrollTo` is called.
@@ -63,7 +72,7 @@ export default function AnimationLogic(options = {}) {
 	 * Holds wether or not the scroll to should be animated.
 	 **/
 	let scrollToWithAnimation = new Animated.Value(0);
-	
+
 	/**
 	 *
 	 **/
@@ -117,10 +126,11 @@ export default function AnimationLogic(options = {}) {
 						round(
 							(() => {
 								if (logicState === LogicState.SPRING) {
-									if(springToNextItemInDirection !== 0){
-										x + itemWidth * springToNextItemInDirection;
-									}
-									else {
+									if (springToNextItemInDirection !== 0) {
+										x +
+											itemWidth *
+												springToNextItemInDirection;
+									} else {
 										x;
 									}
 								} else {
@@ -162,7 +172,13 @@ export default function AnimationLogic(options = {}) {
 	 * Handles decay related stuff.
 	 **/
 	const decayState = (() => {
-		const helper = decayHelper(x, velocity, decayConfig && decayConfig.deceleration ? decayConfig.deceleration : 0.997);
+		const helper = decayHelper(
+			x,
+			velocity,
+			decayConfig && decayConfig.deceleration
+				? decayConfig.deceleration
+				: 0.997,
+		);
 		/**
 		 * Defines if the decay ended up going past our min/max x (if set)
 		 **/
@@ -204,7 +220,7 @@ export default function AnimationLogic(options = {}) {
 		let data = {
 			x: new Animated.Value(0),
 			state: new Animated.Value(-1),
-			velocityX: new Animated.Value(0)
+			velocityX: new Animated.Value(0),
 		};
 
 		/**
