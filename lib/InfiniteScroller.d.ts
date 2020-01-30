@@ -17,6 +17,14 @@ interface InfiniteScrollerProps<T> {
     simultaneousHandlers?: React.RefObject<any>[];
     springConfig?: Object;
     decayConfig?: Object;
+    itemDimensions?: {
+        width: number;
+        height: number;
+    } | null;
+    wrapperDimensions?: {
+        width: number;
+        height: number;
+    } | null;
 }
 interface InfiniteScrollerState {
     itemLayout: {
@@ -36,7 +44,12 @@ export default class InfiniteScroller<T> extends Component<InfiniteScrollerProps
     currentElement?: InfiniteElement<T> | null;
     panHandlerRef: React.RefObject<PanGestureHandler>;
     constructor(props: InfiniteScrollerProps<T>);
-    componentDidUpdate(_prevProps: InfiniteScrollerProps<T>, prevState: InfiniteScrollerState): void;
+    onScrollEnd: ({ x }: {
+        x: number;
+    }) => void;
+    onUpdate(isMounted?: boolean): void;
+    onReady(isMounted?: boolean): void;
+    componentDidUpdate(prevProps: InfiniteScrollerProps<T>, prevState: InfiniteScrollerState): void;
     componentWillUnmount(): void;
     calculateCurrentIndex(moveXValue: number): number;
     getCurrentIndex(): number;

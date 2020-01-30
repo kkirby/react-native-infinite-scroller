@@ -22,6 +22,16 @@ interface AnimationLogic extends EventEmitter {
 	scrollTo(value: number, withAnimation?: boolean): void;
 }
 
-declare const AnimationLogic: () => AnimationLogic;
+interface Config {
+	springConfig?: Object | null;
+	decayConfig?: Object | null;
+	itemWidth?: number | null;
+	wrapperWidth?: number | null;
+	centerScroll?: boolean | null;
+	maxScroll?: number | null;
+	startingPosition?: number | null;
+}
+
+declare const AnimationLogic: (config: Config) => AnimationLogic;
 
 export default AnimationLogic;
