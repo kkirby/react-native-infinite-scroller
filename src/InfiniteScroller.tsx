@@ -121,12 +121,9 @@ export default class InfiniteScroller<T> extends Component<
 		this.infiniteCalculator.x = x;
 		if (this.props.onScrollEnd) {
 			x *= -1;
-			console.log('scrollEnd: ' + x);
 			this.currentElement = this.infiniteElements.find(element => {
-				console.log(element.left, x);
 				return element.left === x;
 			});
-			console.log('scrollEnd: ', this.currentElement);
 			if (this.currentElement != null) {
 				this.props.onScrollEnd(
 					this.currentElement.phase,

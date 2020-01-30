@@ -1,6 +1,6 @@
 import {EventEmitter} from 'events';
 import InfiniteElement from './InfiniteElement';
-import {observable, computed, reaction, trace, observe} from 'mobx';
+import {observable, computed, reaction} from 'mobx';
 
 interface iScrollOptions<T> {
 	infiniteLimit: number;

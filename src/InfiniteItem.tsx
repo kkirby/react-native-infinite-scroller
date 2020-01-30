@@ -23,7 +23,7 @@ export default function InfiniteItem<T>({
 	item,
 	renderItem,
 	onLayout,
-	elementIndex
+	elementIndex,
 }: ItemProps<T>) {
 	const [state, setState] = useState<ItemState<T>>({
 		left: item.left,
@@ -58,7 +58,7 @@ export default function InfiniteItem<T>({
 
 	return (
 		<View style={style} {...props}>
-			{renderItem(state.data,elementIndex)}
+			{renderItem(state.data, elementIndex)}
 		</View>
 	);
 }
