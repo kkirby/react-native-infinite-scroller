@@ -207,6 +207,9 @@ export default class InfiniteScroller<T> extends Component<
 		if (didChange) {
 			this.onUpdate();
 		}
+		if(prevProps.dataset !== this.props.dataset){
+			this.datasetNeedsRefresh();
+		}
 	}
 	
 	datasetNeedsRefresh(){
