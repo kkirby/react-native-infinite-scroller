@@ -7,5 +7,5 @@ interface ItemProps<T> {
     onLayout?: ((e: LayoutChangeEvent) => void) | null;
     elementIndex: number;
 }
-export default function InfiniteItem<T>({ item, renderItem, onLayout, elementIndex }: ItemProps<T>): JSX.Element;
+export default function InfiniteItem<T>({ item, renderItem, onLayout, elementIndex, }: ItemProps<T>): JSX.Element;
 export {};

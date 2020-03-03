@@ -208,6 +208,10 @@ export default class InfiniteScroller<T> extends Component<
 			this.onUpdate();
 		}
 	}
+	
+	datasetNeedsRefresh(){
+		this.infiniteCalculator.updateDataset();
+	}
 
 	componentWillUnmount() {
 		this.infiniteCalculator.dispose();

@@ -141,15 +141,18 @@ export default class InfiniteCalculator<T> extends EventEmitter {
 					};
 				},
 				({dataset, dataStart, cacheSize}) => {
-					dataset(dataStart, cacheSize).then(value =>
-						this.updateCache(dataStart, value),
-					);
+					this.updateDataset();
 				},
 			),
 		);
-
-		this.dataset(this.dataStart, this.cacheSize).then(value =>
-			this.updateCache(this.dataStart, value),
+		
+		this.updateDataset();
+	}
+	
+	updateDataset(){
+		const dataStart = this.dataStart;
+		this.dataset(dataStart, this.cacheSize).then(value =>
+			this.updateCache(dataStart, value),
 		);
 	}
 

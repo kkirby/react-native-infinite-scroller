@@ -61,6 +61,7 @@ export default class InfiniteCalculator<T> extends EventEmitter {
     get dataStart(): number;
     disposers: (() => void)[];
     constructor(options: iScrollOptions<T>);
+    updateDataset(): void;
     dispose(): void;
     reorderInfinite(): InfiniteElement<T>[] | undefined;
     updateContent(elements: InfiniteElement<T>[]): void;

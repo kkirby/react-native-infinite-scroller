@@ -50,6 +50,7 @@ export default class InfiniteScroller<T> extends Component<InfiniteScrollerProps
     onUpdate(isMounted?: boolean): void;
     onReady(isMounted?: boolean): void;
     componentDidUpdate(prevProps: InfiniteScrollerProps<T>, prevState: InfiniteScrollerState): void;
+    datasetNeedsRefresh(): void;
     componentWillUnmount(): void;
     calculateCurrentIndex(moveXValue: number): number;
     getCurrentIndex(): number;
