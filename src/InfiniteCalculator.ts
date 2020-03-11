@@ -2,11 +2,13 @@ import {EventEmitter} from 'events';
 import InfiniteElement from './InfiniteElement';
 import {observable, computed, reaction} from 'mobx';
 
+type DataSetFn<T> = (start: number, count: number) => Promise<T[]>;
+
 interface iScrollOptions<T> {
 	infiniteLimit: number;
 	infiniteElements: InfiniteElement<T>[];
 	cacheSize: number;
-	dataset: (start: number, count: number) => Promise<T[]>;
+	dataset: DataSetFn<T>;
 }
 
 export default class InfiniteCalculator<T> extends EventEmitter {
@@ -16,7 +18,7 @@ export default class InfiniteCalculator<T> extends EventEmitter {
 	@observable infiniteElements: InfiniteElement<T>[] = [];
 	@observable wrapperWidth: number = 0;
 	@observable cacheSize: number = 4;
-	dataset: (start: number, count: number) => Promise<T[]>;
+	dataset: DataSetFn<T>;
 
 	infiniteCache: {
 		[key: string]: T;
@@ -149,11 +151,14 @@ export default class InfiniteCalculator<T> extends EventEmitter {
 		this.updateDataset();
 	}
 	
-	updateDataset(){
+	updateDataset(dataset?: DataSetFn<T> | null){
+		if(dataset != null){
+			this.dataset = dataset;
+		}
 		const dataStart = this.dataStart;
-		this.dataset(dataStart, this.cacheSize).then(value =>
-			this.updateCache(dataStart, value),
-		);
+		this.dataset(dataStart, this.cacheSize).then(value => {
+			this.updateCache(dataStart, value);
+		});
 	}
 
 	dispose() {

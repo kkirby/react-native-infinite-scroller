@@ -1,10 +1,11 @@
 import { EventEmitter } from 'events';
 import InfiniteElement from './InfiniteElement';
+declare type DataSetFn<T> = (start: number, count: number) => Promise<T[]>;
 interface iScrollOptions<T> {
     infiniteLimit: number;
     infiniteElements: InfiniteElement<T>[];
     cacheSize: number;
-    dataset: (start: number, count: number) => Promise<T[]>;
+    dataset: DataSetFn<T>;
 }
 export default class InfiniteCalculator<T> extends EventEmitter {
     x: number;
@@ -13,7 +14,7 @@ export default class InfiniteCalculator<T> extends EventEmitter {
     infiniteElements: InfiniteElement<T>[];
     wrapperWidth: number;
     cacheSize: number;
-    dataset: (start: number, count: number) => Promise<T[]>;
+    dataset: DataSetFn<T>;
     infiniteCache: {
         [key: string]: T;
     } | null;
@@ -61,7 +62,7 @@ export default class InfiniteCalculator<T> extends EventEmitter {
     get dataStart(): number;
     disposers: (() => void)[];
     constructor(options: iScrollOptions<T>);
-    updateDataset(): void;
+    updateDataset(dataset?: DataSetFn<T> | null): void;
     dispose(): void;
     reorderInfinite(): InfiniteElement<T>[] | undefined;
     updateContent(elements: InfiniteElement<T>[]): void;
