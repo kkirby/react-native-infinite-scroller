@@ -98,7 +98,7 @@ export default class InfiniteScroller<T> extends Component<
 			maxScroll:
 				this.state.itemLayout.width !== 0 &&
 				props.totalItemCount != null
-					? -1 * this.state.itemLayout.width * props.totalItemCount
+					? -1 * this.state.itemLayout.width * (props.totalItemCount - 1)
 					: 0,
 			startingPosition,
 		});
@@ -158,7 +158,7 @@ export default class InfiniteScroller<T> extends Component<
 
 		if (this.state.itemLayout.width && this.props.totalItemCount != null) {
 			this.animationLogic.updateMaxScroll(
-				-1 * this.state.itemLayout.width * this.props.totalItemCount,
+				-1 * this.state.itemLayout.width * (this.props.totalItemCount - 1),
 			);
 		}
 
@@ -208,12 +208,13 @@ export default class InfiniteScroller<T> extends Component<
 			this.onUpdate();
 		}
 		if(prevProps.dataset !== this.props.dataset){
+			console.log('refresh dataset');
 			this.datasetNeedsRefresh();
 		}
 	}
 	
 	datasetNeedsRefresh(){
-		this.infiniteCalculator.updateDataset();
+		this.infiniteCalculator.updateDataset(this.props.dataset);
 	}
 
 	componentWillUnmount() {

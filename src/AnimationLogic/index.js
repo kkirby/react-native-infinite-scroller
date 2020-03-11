@@ -62,6 +62,7 @@ export default function AnimationLogic(options = {}) {
 	});
 
 	let maxScrollX = new Animated.Value(getOr(options.maxScroll, 0));
+	let hasMaxScrollX = new Animated.Value(getOr(options.hasMaxScroll, 0));
 
 	/**
 	 * Holds the destination scroll value when `scrollTo` is called.
@@ -138,7 +139,7 @@ export default function AnimationLogic(options = {}) {
 								}
 							}) / itemWidth,
 						) * itemWidth;
-					if (maxScrollX !== 0) {
+					if (hasMaxScrollX === 1) {
 						if (snapPoint > 0) {
 							snapPoint = 0;
 						} else if (snapPoint < maxScrollX) {
@@ -157,7 +158,7 @@ export default function AnimationLogic(options = {}) {
 	 * Defines if we should spring or decay based on maxScrollX.
 	 **/
 	const shouldSpringInsteadOfDecay = re(() => {
-		if (maxScrollX === 0) {
+		if (hasMaxScrollX === 0) {
 			0;
 		} else if (x > 0) {
 			1;
@@ -193,7 +194,7 @@ export default function AnimationLogic(options = {}) {
 					overshot = 0;
 					helper.tick;
 				} else {
-					if (maxScrollX !== 0 && (x > 0 || x < maxScrollX)) {
+					if (hasMaxScrollX === 1 && (x > 0 || x < maxScrollX)) {
 						// If we have a maxScroll set and we went passed it, set overshot to 1.
 						overshot = 1;
 						// Set our velocity to the decay's.
@@ -244,7 +245,7 @@ export default function AnimationLogic(options = {}) {
 			distX = distX + deltaX;
 			newX = x + deltaX;
 			// This will give an elastic feel when over-scrolling, adding resistance to the pull.
-			if (maxScrollX !== 0) {
+			if (hasMaxScrollX === 1) {
 				if (newX > 0 || newX < maxScrollX) {
 					newX = x + deltaX / 3;
 				}
@@ -378,7 +379,14 @@ export default function AnimationLogic(options = {}) {
 			centerScroll.setValue(value ? 1 : 0);
 		},
 		updateMaxScroll(value) {
-			maxScrollX.setValue(value);
+			if(value != null){
+				hasMaxScrollX.setValue(1);
+				maxScrollX.setValue(value);
+			}
+			else {
+				hasMaxScrollX.setValue(0);
+				maxScrollX.setValue(0);
+			}
 		},
 		scrollTo(value, withAnimation = true) {
 			scrollToValue.setValue(value);
