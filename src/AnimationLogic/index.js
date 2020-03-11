@@ -139,9 +139,9 @@ export default function AnimationLogic(options = {}) {
 							}) / itemWidth,
 						) * itemWidth;
 					if (maxScrollX !== 0) {
-						if (x > 0) {
+						if (snapPoint > 0) {
 							snapPoint = 0;
-						} else if (x < maxScrollX) {
+						} else if (snapPoint < maxScrollX) {
 							snapPoint = maxScrollX;
 						}
 					}
