@@ -1,6 +1,6 @@
 {
   "name": "@kkirbatski/react-native-infinite-scroller",
-  "version": "1.0.15",
+  "version": "1.0.16",
   "description": "An infinite scroller for react-native.",
   "main": "lib/InfiniteScroller.js",
   "scripts": {
