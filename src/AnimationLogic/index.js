@@ -261,7 +261,11 @@ export default function AnimationLogic(options = {}) {
 			endTime = baseClock;
 			velocity = data.velocityX;
 			if (shouldSpringInsteadOfDecay === 1 || abs(velocity) < 3000) {
-				springToNextItemInDirection = abs(velocity) / velocity;
+				if (abs(velocity) > 0) {
+					springToNextItemInDirection = abs(velocity) / velocity;
+				} else {
+					springToNextItemInDirection = 0;
+				}
 				logicState = LogicState.SPRING;
 				springState.tick;
 			} else {
