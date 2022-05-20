@@ -95,6 +95,7 @@ export default class InfiniteScroller<T> extends Component<
 				props.centerInWrapper != null ? props.centerInWrapper : false,
 			wrapperWidth: this.state.wrapperLayout.width,
 			itemWidth: this.state.itemLayout.width,
+			hasMaxScroll: this.state.itemLayout.width !== 0 && props.totalItemCount != null,
 			maxScroll:
 				this.state.itemLayout.width !== 0 &&
 				props.totalItemCount != null

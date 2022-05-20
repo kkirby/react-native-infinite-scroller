@@ -28,6 +28,7 @@ interface Config {
 	itemWidth?: number | null;
 	wrapperWidth?: number | null;
 	centerScroll?: boolean | null;
+	hasMaxScroll?: boolean | null;
 	maxScroll?: number | null;
 	startingPosition?: number | null;
 }
